@@ -1,0 +1,64 @@
+server:
+  port: 9876
+  servlet:
+    context-path: /demicar
+spring:
+  application:
+    name: demicar
+  profiles:
+    active: dev # El perfil predeterminado es 'dev'
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: demicar
+  datasource:
+    url: jdbc:mariadb://localhost:3306/demicar_dev
+    username: newuser
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  application:
+    name: demicar
+  datasource:
+    url: jdbc:mariadb://localhost:3306/demicar_test
+    username: newuser
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  application:
+    name: demicar
+  datasource:
+    url: jdbc:mariadb://localhost:3306/demicar_prod
+    username: newuser
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MariaDBDialect
+
+
+
