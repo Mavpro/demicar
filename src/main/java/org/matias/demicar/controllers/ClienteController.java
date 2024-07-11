@@ -64,8 +64,45 @@ public class ClienteController {
 
         }
 
-    }
 
+    }
+    @PostMapping
+    public ResponseEntity<CustomResponse<ClienteDto>> save(@RequestBody ClienteDto body) {
+        CustomResponse<ClienteDto> response = new CustomResponse<>();
+        try {
+            if(clienteService.existByNombreyApellido(body.getNombreApellido())){
+                response.setStatus(HttpStatus.CONFLICT);
+                response.setMessage("El cliente ya existe");
+                response.setErrors(Collections.singletonList("El cliente ya existe"));
+                response.setData(null);
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            }
+            if(clienteService.existByCorreo(body.getEmail())){
+                response.setStatus(HttpStatus.CONFLICT);
+                response.setMessage("El cliente ya existe");
+                response.setErrors(Collections.singletonList("El cliente ya existe"));
+                response.setData(null);
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            }
+
+            ClienteDto persistCliente = clienteService.crearCliente(body);
+            response.setStatus(HttpStatus.OK);
+            response.setData(persistCliente);
+            response.setMessage("Cliente guardado");
+            response.setErrors(Collections.emptyList());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        }catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST);
+            response.setData(null);
+            response.setMessage("NO se que paso");
+            response.setErrors(Collections.singletonList("Anda a saber"));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+
+
+    }
 
 
 

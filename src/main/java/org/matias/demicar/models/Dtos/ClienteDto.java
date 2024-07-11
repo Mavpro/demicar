@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 public class ClienteDto {
     private Long id;
-    private String nombre;
-    private String apellido;
+    private String nombreApellido;
     private String dni;
     private String email;
     private String telefono;

@@ -42,7 +42,7 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
 
     @Override
     public List<ClienteDto> obtenerClientePorNombre(String nombre) {
-        List<Cliente> cliente = clienteRepository.findByNombre(nombre);
+        List<Cliente> cliente = clienteRepository.findByNombreApellido(nombre);
         return cliente.stream()
                 .map(clienteMapper::convertToDto)
                 .collect(Collectors.toList());
@@ -50,7 +50,9 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
 
     @Override
     public ClienteDto crearCliente(ClienteDto clienteDTO) {
-        return null;
+        System.out.println(clienteDTO);
+       Cliente cliente =  clienteRepository.save(clienteMapper.convertToEntity(clienteDTO));
+       return clienteMapper.convertToDto(cliente);
     }
 
     @Override
@@ -64,12 +66,16 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
     }
 
     @Override
-    public Boolean existByNombre(String nombre) {
-        return null;
+    public Boolean existByNombreyApellido(String nombre_y_apellido){
+        return clienteRepository.existsByNombreApellido(nombre_y_apellido);
     }
 
     @Override
     public Boolean existByCorreo(String correo) {
-        return null;
+        return clienteRepository.existsByEmail(correo);
     }
-}
+
+
+    }
+
+

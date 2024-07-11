@@ -17,7 +17,7 @@ List<ClienteDto> getClientes();
 
     void eliminarCliente(Long id);
 
-    Boolean existByNombre(String nombre);
+    Boolean existByNombreyApellido(String nombre);
 
     Boolean existByCorreo(String correo);
 
