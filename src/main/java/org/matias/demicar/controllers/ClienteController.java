@@ -5,6 +5,8 @@ import org.matias.demicar.models.Mappers.ClienteMapperService;
 import org.matias.demicar.models.entities.Cliente;
 import org.matias.demicar.responses.CustomResponse;
 import org.matias.demicar.services.ClienteServiceI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.ssl.DefaultSslBundleRegistry;
@@ -24,8 +26,8 @@ public class ClienteController {
     @Autowired
     ClienteServiceI clienteService;
     ClienteMapperService clienteMapper;
-    @Autowired
-    private DefaultSslBundleRegistry sslBundleRegistry;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClienteController.class);
+
 
     @GetMapping
     public ResponseEntity<CustomResponse<List<ClienteDto>>> findAllClientes(@RequestParam(required = false) String nombre) {
@@ -35,7 +37,7 @@ public class ClienteController {
             List<ClienteDto> clientes = new ArrayList<>();
             if (nombre == null) {
                 clientes.addAll(clienteService.getClientes());//no pone el nombre, todos
-            }else{
+            } else {
                 clienteService.obtenerClientePorNombre(nombre).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
             }
             if (clientes.isEmpty() || clientes.size() == 0) { // VACIO ?
@@ -45,8 +47,7 @@ public class ClienteController {
                 response.setErrors(errores);
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
-            }
-            else {
+            } else {
                 response.setStatus(HttpStatus.OK);
                 response.setData(clientes);
                 response.setMessage("Clientes encontrados");
@@ -66,46 +67,48 @@ public class ClienteController {
 
 
     }
+
     @PostMapping
     public ResponseEntity<CustomResponse<ClienteDto>> save(@RequestBody ClienteDto body) {
         CustomResponse<ClienteDto> response = new CustomResponse<>();
+        List<String> errors = new ArrayList<>(); // Create an empty list to store errors
+
         try {
-            if(clienteService.existByNombreyApellido(body.getNombreApellido())){
-                response.setStatus(HttpStatus.CONFLICT);
-                response.setMessage("El cliente ya existe");
-                response.setErrors(Collections.singletonList("El cliente ya existe"));
-                response.setData(null);
-                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-            }
-            if(clienteService.existByCorreo(body.getEmail())){
-                response.setStatus(HttpStatus.CONFLICT);
-                response.setMessage("El cliente ya existe");
-                response.setErrors(Collections.singletonList("El cliente ya existe"));
-                response.setData(null);
-                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            // Check for existing client with same email
+            if (clienteService.existByCorreo(body.getEmail())) {
+                errors.add("El cliente ya existe con el correo electrónico proporcionado");
             }
 
-            ClienteDto persistCliente = clienteService.crearCliente(body);
-            response.setStatus(HttpStatus.OK);
-            response.setData(persistCliente);
-            response.setMessage("Cliente guardado");
-            response.setErrors(Collections.emptyList());
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            // Check for existing client with same name and last name
+            if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
+                errors.add("El cliente ya existe con el nombre y apellido proporcionados");
+            }
 
-        }catch (Exception e) {
-            response.setStatus(HttpStatus.BAD_REQUEST);
+            // If no errors found, proceed with saving the client
+            if (errors.isEmpty()) {
+                ClienteDto persistedCliente = clienteService.crearCliente(body);
+                response.setStatus(HttpStatus.OK);
+                response.setData(persistedCliente);
+                response.setMessage("Cliente guardado");
+                response.setErrors(Collections.emptyList());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else { // If errors found, return them in the response
+                response.setStatus(HttpStatus.BAD_REQUEST);
+                response.setData(null);
+                response.setMessage("Error al guardar el cliente");
+                response.setErrors(errors);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Error saving client", e);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Error al guardar el cliente");
+            response.setErrors(Collections.singletonList("Ocurrió un error inesperado"));
             response.setData(null);
-            response.setMessage("NO se que paso");
-            response.setErrors(Collections.singletonList("Anda a saber"));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
-
     }
-
-
-
 
 }
 
