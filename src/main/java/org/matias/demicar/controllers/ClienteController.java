@@ -1,22 +1,30 @@
 package org.matias.demicar.controllers;
 
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
 import org.matias.demicar.models.entities.Cliente;
 import org.matias.demicar.responses.CustomResponse;
 import org.matias.demicar.services.ClienteServiceI;
+import org.matias.demicar.validator.BindingValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.ssl.DefaultSslBundleRegistry;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.LazyInitializationExcludeFilter;
+
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.Binding;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -27,6 +35,7 @@ public class ClienteController {
     ClienteServiceI clienteService;
     ClienteMapperService clienteMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(ClienteController.class);
+
 
 
     @GetMapping
@@ -69,46 +78,47 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<CustomResponse<ClienteDto>> save(@RequestBody ClienteDto body) {
+    public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body, BindingResult bindingResult ) {
         CustomResponse<ClienteDto> response = new CustomResponse<>();
         List<String> errors = new ArrayList<>(); // Create an empty list to store errors
-
+        BindingValidator validator = new BindingValidator();
         try {
-            // Check for existing client with same email
-            if (clienteService.existByCorreo(body.getEmail())) {
-                errors.add("El cliente ya existe con el correo electrónico proporcionado");
-            }
-
-            // Check for existing client with same name and last name
             if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
-                errors.add("El cliente ya existe con el nombre y apellido proporcionados");
+                errors.add("Nombre ya existe");
             }
-
-            // If no errors found, proceed with saving the client
-            if (errors.isEmpty()) {
-                ClienteDto persistedCliente = clienteService.crearCliente(body);
-                response.setStatus(HttpStatus.OK);
-                response.setData(persistedCliente);
-                response.setMessage("Cliente guardado");
-                response.setErrors(Collections.emptyList());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else { // If errors found, return them in the response
-                response.setStatus(HttpStatus.BAD_REQUEST);
-                response.setData(null);
-                response.setMessage("Error al guardar el cliente");
-                response.setErrors(errors);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            if (clienteService.existByCorreo(body.getEmail())) {
+                errors.add("El email ya existe");
             }
+            if (errors.size() > 0) {
 
-        } catch (Exception e) {
-            LOGGER.error("Error saving client", e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.setMessage("Error al guardar el cliente");
-            response.setErrors(Collections.singletonList("Ocurrió un error inesperado"));
+            errors.addAll(validator.ValidaCampos(bindingResult));
+            response.setMessage("Cliente ya existe");
+            response.setErrors(errors);
             response.setData(null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        }
+        if(bindingResult.hasErrors()) {
+                response.setErrors(validator.ValidaCampos(bindingResult));
+                response.setMessage("Revise los campos");
+                response.setData(null);
+                response.setStatus(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+            }
+
+            ClienteDto persistCliente = clienteService.crearCliente(body);
+            response.setStatus(HttpStatus.OK);
+            response.setData(persistCliente);
+            response.setMessage("Cliente guardado");
+            response.setErrors(Collections.emptyList());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        }catch (Exception e) {
+            response.setStatus(HttpStatus.BAD_REQUEST);
+            response.setData(null);
+            response.setMessage("NO se que paso");
+            response.setErrors(Collections.singletonList("Anda a saber"));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
-
 }
-
