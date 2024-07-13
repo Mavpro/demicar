@@ -78,34 +78,36 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body, BindingResult bindingResult ) {
+    public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
         CustomResponse<ClienteDto> response = new CustomResponse<>();
-        List<String> errors = new ArrayList<>(); // Create an empty list to store errors
-        BindingValidator validator = new BindingValidator();
-        try {
-            if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
-                errors.add("Nombre ya existe");
-            }
-            if (clienteService.existByCorreo(body.getEmail())) {
-                errors.add("El email ya existe");
-            }
-            if (errors.size() > 0) {
+        List<String> errors = new ArrayList<>();
 
-            errors.addAll(validator.ValidaCampos(bindingResult));
-            response.setMessage("Cliente ya existe");
+        // Validar los campos usando BindingResult
+        if (bindingResult.hasErrors()) {
+            errors.addAll(bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList()));
+        }
+
+        // Validar reglas de negocio
+        if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
+            errors.add("Nombre ya existe");
+        }
+        if (clienteService.existByCorreo(body.getEmail())) {
+            errors.add("El email ya existe");
+        }
+
+        // Manejar errores si existen
+        if (!errors.isEmpty()) {
             response.setErrors(errors);
+            response.setMessage("Errores de validación");
             response.setData(null);
+            response.setStatus(HttpStatus.CONFLICT);
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
-        if(bindingResult.hasErrors()) {
-                response.setErrors(validator.ValidaCampos(bindingResult));
-                response.setMessage("Revise los campos");
-                response.setData(null);
-                response.setStatus(HttpStatus.BAD_REQUEST);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
-            }
-
+        try {
+            // Guardar cliente si no hay errores
             ClienteDto persistCliente = clienteService.crearCliente(body);
             response.setStatus(HttpStatus.OK);
             response.setData(persistCliente);
@@ -113,12 +115,13 @@ public class ClienteController {
             response.setErrors(Collections.emptyList());
             return new ResponseEntity<>(response, HttpStatus.OK);
 
-        }catch (Exception e) {
-            response.setStatus(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            LOGGER.error("Error saving client", e);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             response.setData(null);
-            response.setMessage("NO se que paso");
-            response.setErrors(Collections.singletonList("Anda a saber"));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            response.setMessage("Ocurrió un error inesperado");
+            response.setErrors(Collections.singletonList("Error al guardar el cliente"));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
