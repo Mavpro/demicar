@@ -57,6 +57,12 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
 
     @Override
     public ClienteDto actualizarCliente(Long id, ClienteDto clienteDTO) {
+        if (clienteRepository.existsById(id)) {
+            clienteDTO.setId(id);
+            Cliente cliente = clienteMapper.convertToEntity(clienteDTO);
+            cliente = clienteRepository.save(cliente);
+            return clienteMapper.convertToDto(cliente);
+        }
         return null;
     }
 
@@ -75,7 +81,12 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
         return clienteRepository.existsByEmail(correo);
     }
 
-
+    @Override
+    public Boolean existById(Long id) {
+        return clienteRepository.existsById(id);
     }
+
+
+}
 
 

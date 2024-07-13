@@ -12,4 +12,5 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
     Boolean existsByNombreApellido(String nombreApellido);
     Boolean existsByEmail(String email);
 
+
 }

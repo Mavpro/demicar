@@ -1,26 +1,19 @@
 package org.matias.demicar.controllers;
 
 import jakarta.validation.Valid;
-import jakarta.validation.Validation;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
-import org.matias.demicar.models.entities.Cliente;
 import org.matias.demicar.responses.CustomResponse;
 import org.matias.demicar.services.ClienteServiceI;
-import org.matias.demicar.validator.BindingValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.LazyInitializationExcludeFilter;
 
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.Binding;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +42,7 @@ public class ClienteController {
             } else {
                 clienteService.obtenerClientePorNombre(nombre).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
             }
-            if (clientes.isEmpty() || clientes.size() == 0) { // VACIO ?
+            if (clientes.isEmpty() ) { // VACIO ?
                 errores.add("No se encontro el cliente");
                 response.setData(null);
                 response.setMessage("No hay clientes para mostrar");
@@ -88,7 +81,6 @@ public class ClienteController {
                     .map(error -> error.getField() + ": " + error.getDefaultMessage())
                     .collect(Collectors.toList()));
         }
-
         // Validar reglas de negocio
         if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
             errors.add("Nombre ya existe");
@@ -96,7 +88,6 @@ public class ClienteController {
         if (clienteService.existByCorreo(body.getEmail())) {
             errors.add("El email ya existe");
         }
-
         // Manejar errores si existen
         if (!errors.isEmpty()) {
             response.setErrors(errors);
@@ -105,7 +96,6 @@ public class ClienteController {
             response.setStatus(HttpStatus.CONFLICT);
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
-
         try {
             // Guardar cliente si no hay errores
             ClienteDto persistCliente = clienteService.crearCliente(body);
@@ -114,7 +104,6 @@ public class ClienteController {
             response.setMessage("Cliente guardado");
             response.setErrors(Collections.emptyList());
             return new ResponseEntity<>(response, HttpStatus.OK);
-
         } catch (Exception e) {
             LOGGER.error("Error saving client", e);
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -123,5 +112,43 @@ public class ClienteController {
             response.setErrors(Collections.singletonList("Error al guardar el cliente"));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PutMapping("/{id}")
+    public  ResponseEntity<CustomResponse<ClienteDto>> update(@PathVariable Long id, @Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
+        CustomResponse<ClienteDto> response = new CustomResponse<>();
+        List<String> errors = new ArrayList<>();
+        if (bindingResult.hasErrors()) {
+            errors.addAll(bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList()));
+        }
+        if (!errors.isEmpty()||!clienteService.existById(id)) {
+            if (!clienteService.existById(body.getId())){
+                errors.add("El cliente no existe");
+            }
+            response.setErrors(errors);
+            response.setMessage("No se pudo actualizar el cliente");
+            response.setData(null);
+            response.setStatus(HttpStatus.CONFLICT);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        }
+        try {
+            // Guardar cliente si no hay errores
+            ClienteDto persistCliente = clienteService.actualizarCliente(body.getId(),body);
+            response.setStatus(HttpStatus.OK);
+            response.setData(persistCliente);
+            response.setMessage("Cliente actualizado");
+            response.setErrors(Collections.emptyList());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            LOGGER.error("Error saving client", e);
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setData(null);
+            response.setMessage("Ocurrió un error inesperado");
+            response.setErrors(Collections.singletonList("Error al guardar el cliente"));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
     }
 }

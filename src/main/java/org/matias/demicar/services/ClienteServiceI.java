@@ -1,5 +1,6 @@
 package org.matias.demicar.services;
 
+import jakarta.persistence.Id;
 import org.matias.demicar.models.Dtos.ClienteDto;
 
 import java.util.List;
@@ -20,5 +21,7 @@ List<ClienteDto> getClientes();
     Boolean existByNombreyApellido(String nombre);
 
     Boolean existByCorreo(String correo);
+
+    Boolean existById(Long id);
 
 }
