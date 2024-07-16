@@ -15,4 +15,5 @@ public class Coordinador {
     private String nombre;
     private String email; // Sugerido
     private String telefono; // Sugerido
+    private boolean activo;
 }
