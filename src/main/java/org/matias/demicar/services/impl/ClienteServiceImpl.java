@@ -51,24 +51,24 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
     @Override
     public ClienteDto crearCliente(ClienteDto clienteDTO) {
         System.out.println(clienteDTO);
+        clienteDTO.setActivo(true);
        Cliente cliente =  clienteRepository.save(clienteMapper.convertToEntity(clienteDTO));
        return clienteMapper.convertToDto(cliente);
     }
 
     @Override
     public ClienteDto actualizarCliente(Long id, ClienteDto clienteDTO) {
-        if (clienteRepository.existsById(id)) {
-            clienteDTO.setId(id);
-            Cliente cliente = clienteMapper.convertToEntity(clienteDTO);
-            cliente = clienteRepository.save(cliente);
-            return clienteMapper.convertToDto(cliente);
-        }
-        return null;
+
+return null;
+
     }
 
     @Override
-    public void eliminarCliente(Long id) {
-
+    public Optional eliminarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id).orElse(null);
+        cliente.setActivo(false);
+        clienteRepository.save(cliente);
+        return Optional.of(cliente);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.matias.demicar.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,9 @@ public class Cliente {
     private String dni;
     private String email; // Sugerido
     private String telefono; // Sugerido
+    @JsonProperty(defaultValue = "false")
+    private Boolean activo;
+
 
     @OneToMany(mappedBy = "cliente")
     private List<SolicitudDeAgenda> solicitudesDeAgenda;

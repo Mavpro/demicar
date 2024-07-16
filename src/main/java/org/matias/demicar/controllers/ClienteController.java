@@ -38,9 +38,9 @@ public class ClienteController {
         try {
             List<ClienteDto> clientes = new ArrayList<>();
             if (nombre == null) {
-                clientes.addAll(clienteService.getClientes());//no pone el nombre, todos
+                clientes.addAll(clienteService.getClientes().stream().filter(c->c.isActivo()).collect(Collectors.toList()));//no pone el nombre, todos
             } else {
-                clienteService.obtenerClientePorNombre(nombre).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
+                clienteService.obtenerClientePorNombre(nombre).stream().filter(c->c.isActivo()).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
             }
             if (clientes.isEmpty() ) { // VACIO ?
                 errores.add("No se encontro el cliente");
@@ -151,4 +151,38 @@ public class ClienteController {
 
 
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomResponse<ClienteDto>> delete(@Valid @PathVariable Long id) {
+        CustomResponse<ClienteDto> response = new CustomResponse<>();
+        List<String> errors = new ArrayList<>();
+            try {
+                if (clienteService.existById(id)) {
+                    clienteService.eliminarCliente(id);
+                    response.setStatus(HttpStatus.OK);
+                    response.setData(null);
+                    response.setMessage("Cliente eliminado");
+                    response.setErrors(Collections.emptyList());
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                }
+
+                errors.add("El cliente no existe");
+                response.setErrors(errors);
+                response.setMessage("No se pudo eliminar el cliente");
+                response.setData(null);
+                response.setStatus(HttpStatus.CONFLICT);
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+
+            }catch (Exception e){
+                LOGGER.error("Error saving client", e);
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                response.setData(null);
+                response.setMessage("Error al eliminar el cliente");
+                response.setErrors(Collections.singletonList("Error al eliminar el cliente"));
+                return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+        }
+    }
+
+
 }

@@ -1,13 +1,13 @@
 package org.matias.demicar.models.Dtos;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Check;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 
 @Data
@@ -32,6 +32,9 @@ public class ClienteDto {
     @NotBlank(message = "El número de teléfono no puede estar vacío")
     @Pattern(regexp = "[0-9]{10}", message = "El número de teléfono debe tener al menos 9 dígitos numéricos")
     private String telefono;
+
+    private boolean activo;
+
 
     // Getters and setters omitted for brevity
 }

@@ -16,7 +16,7 @@ List<ClienteDto> getClientes();
 
     ClienteDto actualizarCliente(Long id, ClienteDto clienteDTO);
 
-    void eliminarCliente(Long id);
+    Optional eliminarCliente(Long id);
 
     Boolean existByNombreyApellido(String nombre);
 
