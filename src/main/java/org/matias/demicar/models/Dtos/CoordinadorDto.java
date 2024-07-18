@@ -9,5 +9,5 @@ public class CoordinadorDto {
     private String nombre;
     private String email;
     private String telefono;
-    private boolean active;
+    private boolean activo;
 }
