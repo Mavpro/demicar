@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public class Instructor {
 
     @OneToMany(mappedBy = "instructor")
     List<Clase> clasesImpartidas;
+
+
 }
