@@ -18,7 +18,6 @@ List<SolicitudDeAgendaDto> getSolicitudDeAgendas();
 
     Optional eliminarSolicitudDeAgenda(Long id);
 
-    //Boolean existByNombreyApellido(String nombre);
 
     //Boolean existByCorreo(String correo);
 

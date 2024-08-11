@@ -39,9 +39,9 @@ public class ClienteController {
         try {
             List<ClienteDto> clientes = new ArrayList<>();
             if (nombre == null) {
-                clientes.addAll(clienteService.getClientes().stream().filter(c->c.isActivo()).collect(Collectors.toList()));//no pone el nombre, todos
+                clientes.addAll(clienteService.getClientes().stream().filter(c->c.getActivo()).collect(Collectors.toList()));//no pone el nombre, todos
             } else {
-                clienteService.obtenerClientePorNombre(nombre).stream().filter(c->c.isActivo()).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
+                clienteService.obtenerClientePorNombre(nombre).stream().filter(c->c.getActivo()).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
             }
             if (clientes.isEmpty() ) { // VACIO ?
                 errores.add("No se encontro el cliente");

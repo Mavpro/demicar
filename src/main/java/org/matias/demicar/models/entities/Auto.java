@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
-@Data
 @Entity
+@Data
 @Table(name = "autos")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +22,7 @@ public class Auto {
     private String estado; // Sugerido: disponible, en mantenimiento, etc.
 
     @OneToMany(mappedBy = "auto", cascade = CascadeType.ALL)
-    private List<Clase> clasesAsignadas;
+    private List<SolicitudDeAgenda> solicitudDeAgenda;
 
     private boolean activo;
 

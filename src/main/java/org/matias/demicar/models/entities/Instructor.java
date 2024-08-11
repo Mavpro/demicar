@@ -1,10 +1,10 @@
 package org.matias.demicar.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ public class Instructor {
     private boolean activo;
 
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
-    List<Clase> clasesImpartidas;
-
+    private List<SolicitudDeAgenda> solicitudesDeAgenda;
 
 }

@@ -15,18 +15,31 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SolicitudDeAgenda {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-@JoinColumn(name="cliente_id")
-    @JsonBackReference
 
+    @ManyToOne
+    @JoinColumn(name="cliente_id")
     private Cliente cliente;
 
-private String estado; // Sugerido: pendiente, confirmada, cancelada
-private LocalDateTime fechaSolicitud; // Sugerido
-private LocalDateTime fechaClase; // Sugerido
-private boolean activo;
+    @ManyToOne
+    @JoinColumn(name="auto_id")
+    private Auto auto;
+
+    @ManyToOne
+    @JoinColumn(name="instructor_id")
+    private Instructor instructor;
+
+    @OneToOne(mappedBy = "solicitudDeAgenda")
+    private Clase clase;
+
+    private LocalDateTime fechaSolicitud; // Sugerido
+    private LocalDateTime fechaClase; // Sugerido
+
+    private String estado; // Sugerido: pendiente, confirmada, cancelada
+
+    private boolean activo;
 
 }

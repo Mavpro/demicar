@@ -4,19 +4,21 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.matias.demicar.models.entities.Instructor;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class SolicitudDeAgendaDto {
+
     private Long id;
-    @JsonBackReference
-    private ClienteDto cliente;
-    private String estado;
+    private ClienteDto cliente;  // DTO para Cliente
+    private InstructorDto instructor;  // DTO para Instructor
+    private ClaseDto clase;  // DTO para Clase
     private LocalDateTime fechaSolicitud;
     private LocalDateTime fechaClase;
+    private String estado;
     private boolean activo;
-
 }

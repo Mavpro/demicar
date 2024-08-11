@@ -22,5 +22,5 @@ public class Coordinador {
     private boolean activo;
 
     @OneToMany(mappedBy="coordinador")
-    private List<Asignacion> asignaciones;
+    private List<Clase> clases;
 }

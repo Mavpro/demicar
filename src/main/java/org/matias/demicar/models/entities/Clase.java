@@ -1,17 +1,16 @@
 package org.matias.demicar.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "clases")
+@Table(name="clases")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Clase {
@@ -20,21 +19,19 @@ public class Clase {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "solicitudAsignada")
     private SolicitudDeAgenda solicitudDeAgenda;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id")
-    private Instructor instructor;
+    @JoinColumn(name="coordinador_id")
+    private Coordinador coordinador;
 
-    private String tema; // Sugerido
-    private LocalDateTime fechaHora; // Sugerido
+    private LocalDate fechaDeAsignacion;
 
-    @ManyToOne
-    @JoinColumn(name = "auto_id")
-    private Auto auto;
+    private String estado;
 
-    @OneToMany(mappedBy="clase")
-    private List<Asignacion> asignaciones;
+    private boolean activo;
 
+
+    // ... otros atributos y métodos
 }

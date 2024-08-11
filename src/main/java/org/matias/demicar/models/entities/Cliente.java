@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
 @Entity
+@Data
 @Table(name = "clientes")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,11 +26,8 @@ public class Cliente {
     @JsonProperty(defaultValue = "false")
     private Boolean activo;
 
-
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<SolicitudDeAgenda> solicitudesDeAgenda;
-
 
 
 }
