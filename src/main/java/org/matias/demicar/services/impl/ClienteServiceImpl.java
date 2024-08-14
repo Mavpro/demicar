@@ -78,7 +78,6 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
             agendasCclientes.add(agenda);
         }
 
-
         cliente.setSolicitudesDeAgenda(agendasCclientes);
         clienteRepository.save(cliente);
 

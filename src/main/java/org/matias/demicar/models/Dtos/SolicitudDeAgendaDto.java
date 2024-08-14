@@ -19,6 +19,7 @@ public class SolicitudDeAgendaDto {
     private ClaseDto clase;  // DTO para Clase
     private LocalDateTime fechaSolicitud;
     private LocalDateTime fechaClase;
+    private String tema;
     private String estado;
     private boolean activo;
 }

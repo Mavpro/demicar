@@ -35,6 +35,8 @@ public class SolicitudDeAgenda {
     @OneToOne(mappedBy = "solicitudDeAgenda")
     private Clase clase;
 
+    private String tema;
+
     private LocalDateTime fechaSolicitud; // Sugerido
     private LocalDateTime fechaClase; // Sugerido
 

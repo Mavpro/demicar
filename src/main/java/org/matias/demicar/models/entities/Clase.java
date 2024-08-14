@@ -28,6 +28,10 @@ public class Clase {
 
     private LocalDate fechaDeAsignacion;
 
+    private String tema;
+
+    private int eval;
+
     private String estado;
 
     private boolean activo;

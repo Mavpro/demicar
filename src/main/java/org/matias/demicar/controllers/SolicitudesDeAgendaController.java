@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
+import org.matias.demicar.models.entities.SolicitudDeAgenda;
 import org.matias.demicar.responses.CustomResponse;
 import org.matias.demicar.services.ClienteServiceI;
 import org.matias.demicar.services.SolicitudDeAgendaServiceI;
@@ -32,7 +33,13 @@ public class SolicitudesDeAgendaController {
     @Autowired
     SolicitudDeAgendaServiceI solicitudDeAgendaService;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolicitudesDeAgendaController.class);
-/*
+
+
+
+
+
+    /*
+
 
         @PostMapping
         public ResponseEntity<SolicitudDeAgendaDto> save(@RequestBody SolicitudDeAgendaDto solicitud,BindingResult bindingResult) {
