@@ -1,15 +1,20 @@
 package org.matias.demicar.services.impl;
 
+import jakarta.validation.ValidationException;
+import org.matias.demicar.exeptions.ResourceNotFoundException;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Dtos.InstructorDto;
 import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 import org.matias.demicar.models.Mappers.AutoMapperService;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
+import org.matias.demicar.models.Mappers.InstructorMapperService;
 import org.matias.demicar.models.Mappers.SolicitudDeAgendaMapperService;
 import org.matias.demicar.models.entities.Cliente;
+import org.matias.demicar.models.entities.Instructor;
 import org.matias.demicar.models.entities.SolicitudDeAgenda;
 import org.matias.demicar.respositories.AutoRepository;
 import org.matias.demicar.respositories.ClienteRepository;
+import org.matias.demicar.respositories.InstructorRepository;
 import org.matias.demicar.respositories.SolicitudDeAgendaRepository;
 import org.matias.demicar.services.SolicitudDeAgendaServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +35,18 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
     private final ClienteRepository clienteRepository;
     private final AutoMapperService autoMapperService;
     private final AutoRepository autoRepository;
+    private final InstructorRepository instructorRepository;
+    private final InstructorMapperService instructorMapperService;
 
-    public SolicitudDeAgendaServiceImpl(SolicitudDeAgendaMapperService solicitudDeAgendaMapper, SolicitudDeAgendaRepository solicitudDeAgendaRepository, ClienteMapperService clienteMapperService, ClienteRepository clienteRepository, AutoMapperService autoMapperService, AutoRepository autoRepository) {
+    public SolicitudDeAgendaServiceImpl(SolicitudDeAgendaMapperService solicitudDeAgendaMapper, SolicitudDeAgendaRepository solicitudDeAgendaRepository, ClienteMapperService clienteMapperService, ClienteRepository clienteRepository, AutoMapperService autoMapperService, AutoRepository autoRepository, InstructorRepository instructorRepository, InstructorMapperService instructorMapperService) {
         this.solicitudDeAgendaMapper = solicitudDeAgendaMapper;
         this.solicitudDeAgendaRepository = solicitudDeAgendaRepository;
         this.clienteMapperService = clienteMapperService;
         this.clienteRepository = clienteRepository;
         this.autoMapperService = autoMapperService;
         this.autoRepository = autoRepository;
+        this.instructorRepository = instructorRepository;
+        this.instructorMapperService = instructorMapperService;
     }
 
 
@@ -56,29 +65,67 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
     }
 
     @Override
-    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorCliente(ClienteDto cliente, Long id) {
-        return List.of();
+    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorCliente(Long id) {
+        List<SolicitudDeAgenda> solicitudesCliente = solicitudDeAgendaRepository.findByCliente_Id(id);
+        return solicitudesCliente.stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructor(InstructorDto instructor, Long id) {
-        return List.of();
+    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructor(Long id) {
+        List<SolicitudDeAgenda> solicitudesCliente = solicitudDeAgendaRepository.findByInstructor_Id(id);
+        return solicitudesCliente.stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructorPorFechas(InstructorDto instructor, Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        return List.of();
+    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructorPorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return solicitudDeAgendaRepository.findAllByInstructorIdAndFechaClaseBetween(id,fechaInicio,fechaFin)
+                .stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorClientePorFechas(ClienteDto cliente, Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        return List.of();
+    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorClientePorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return solicitudDeAgendaRepository.findAllByCliente_IdAndFechaClaseBetween(id,fechaInicio,fechaFin)
+                .stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public SolicitudDeAgendaDto crearSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO) {
-        return null;
+        // Obtener el instructor y el cliente a partir de sus IDs
+        Instructor instructor = instructorRepository.findById(solicitudDeAgendaDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor no encontrado"));
+        Cliente cliente = clienteRepository.findById(solicitudDeAgendaDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
+        // Verificar que el instructor no tenga clases agendadas en el mismo horario
+        LocalDateTime fechaClaseSolicitada = solicitudDeAgendaDTO.getFechaClase();
+        List<SolicitudDeAgenda> solicitudesInstructor = solicitudDeAgendaRepository
+                .findAllByInstructorIdAndFechaClaseBetween(instructor.getId(), fechaClaseSolicitada.minusMinutes(15), fechaClaseSolicitada.plusMinutes(15));
+
+        if (!solicitudesInstructor.isEmpty()) {
+            throw new ValidationException("El instructor ya tiene una clase agendada en este horario o en un intervalo de 15 minutos.");
+        }
+
+        // Verificar que el cliente no tenga clases agendadas en el mismo horario
+        List<SolicitudDeAgenda> solicitudesCliente = solicitudDeAgendaRepository
+                .findAllByCliente_IdAndFechaClaseBetween(cliente.getId(), fechaClaseSolicitada.minusMinutes(15), fechaClaseSolicitada.plusMinutes(15));
+
+        if (!solicitudesCliente.isEmpty()) {
+            throw new ValidationException("El cliente ya tiene una clase agendada en este horario o en un intervalo de 15 minutos.");
+        }
+
+        // Crear la nueva solicitud de agenda
+        SolicitudDeAgenda nuevaSolicitud = solicitudDeAgendaMapper.convertToEntity(solicitudDeAgendaDTO);
+        nuevaSolicitud.setInstructor(instructor);
+        nuevaSolicitud.setCliente(cliente);
+        nuevaSolicitud.setActivo(true); // Marcar la solicitud como activa
+
+        // Guardar la solicitud en la base de datos
+        SolicitudDeAgenda solicitudGuardada = solicitudDeAgendaRepository.save(nuevaSolicitud);
+
+        // Retornar el DTO de la solicitud creada
+        return solicitudDeAgendaMapper.convertToDto(solicitudGuardada);
     }
+
 
     @Override
     public SolicitudDeAgendaDto actualizarSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO, Long id) {

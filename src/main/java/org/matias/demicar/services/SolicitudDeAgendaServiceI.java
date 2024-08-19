@@ -13,12 +13,12 @@ public interface SolicitudDeAgendaServiceI {
 List<SolicitudDeAgendaDto> getSolicitudDeAgendas();
     Optional<SolicitudDeAgendaDto> obtenerSolicitudDeAgendaPorId(Long id);
 
-    List<SolicitudDeAgendaDto>  obtenerSolicitudDeAgendasPorCliente(ClienteDto cliente, Long id);
+    List<SolicitudDeAgendaDto>  obtenerSolicitudDeAgendasPorCliente(Long id);
 
-    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructor(InstructorDto instructor,Long id);
+    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructor(Long id);
 
-    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructorPorFechas(InstructorDto instructor, Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
-    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorClientePorFechas(ClienteDto cliente, Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
+    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorInstructorPorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
+    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorClientePorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
 
     SolicitudDeAgendaDto crearSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO);

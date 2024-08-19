@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +14,7 @@ public class ClaseDto {
     private Long id;
     private SolicitudDeAgendaDto solicitudDeAgenda;  // Incluye el DTO completo
     private CoordinadorDto coordinador;  // Incluye el DTO completo
-    private LocalDate fechaDeAsignacion;
+    private LocalDateTime fechaDeAsignacion;
     private String estado;
     private boolean activo;
 

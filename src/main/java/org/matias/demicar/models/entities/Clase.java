@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -26,7 +27,7 @@ public class Clase {
     @JoinColumn(name="coordinador_id")
     private Coordinador coordinador;
 
-    private LocalDate fechaDeAsignacion;
+    private LocalDateTime fechaDeAsignacion;
 
     private String tema;
 

@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface AutoRepository extends CrudRepository<Auto, Long> {
     List<Auto> findByMatricula(String matricula);
-    List<Auto> findByMatriculaAndEstado(Cliente cliente);
-    List<Auto> findBySolicitudDeAgenda(String matricula, SolicitudDeAgenda solicitudDeAgenda);
+    List<Auto> findByMatriculaAndEstado(String matricula, String estado);
+    List<Auto> findBySolicitudDeAgenda(SolicitudDeAgenda solicitudDeAgenda);
     Boolean existsByMatriculaAndEstado(String matricula,String estado);
     Boolean existsById(long id);
 
