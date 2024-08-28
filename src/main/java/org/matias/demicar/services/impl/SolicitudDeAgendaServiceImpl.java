@@ -2,8 +2,6 @@ package org.matias.demicar.services.impl;
 
 import jakarta.validation.ValidationException;
 import org.matias.demicar.exeptions.ResourceNotFoundException;
-import org.matias.demicar.models.Dtos.ClienteDto;
-import org.matias.demicar.models.Dtos.InstructorDto;
 import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 import org.matias.demicar.models.Mappers.AutoMapperService;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
@@ -17,7 +15,6 @@ import org.matias.demicar.respositories.ClienteRepository;
 import org.matias.demicar.respositories.InstructorRepository;
 import org.matias.demicar.respositories.SolicitudDeAgendaRepository;
 import org.matias.demicar.services.SolicitudDeAgendaServiceI;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -87,6 +84,11 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
         return solicitudDeAgendaRepository.findAllByCliente_IdAndFechaClaseBetween(id,fechaInicio,fechaFin)
                 .stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
+    @Override
+    public List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorAutoPorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return solicitudDeAgendaRepository.findAllByAuto_IdAndFechaClaseBetween(id,fechaInicio,fechaFin)
+                .stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
+    }
 
     @Override
     public SolicitudDeAgendaDto crearSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO) {
@@ -112,6 +114,7 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
         if (!solicitudesCliente.isEmpty()) {
             throw new ValidationException("El cliente ya tiene una clase agendada en este horario o en un intervalo de 15 minutos.");
         }
+
 
         // Crear la nueva solicitud de agenda
         SolicitudDeAgenda nuevaSolicitud = solicitudDeAgendaMapper.convertToEntity(solicitudDeAgendaDTO);

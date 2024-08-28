@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.matias.demicar.models.entities.SolicitudDeAgenda;
 
 import java.util.List;
 
@@ -32,10 +33,11 @@ public class AutoDto {
     @NotNull(message = "El estado es obligatorio")
     private String estado; // Enum EstadoVehiculo
 
+
     @NotNull(message = "El campo activo es obligatorio")
     private Boolean activo;
 
-    @NotNull(message = "Debe asignarse al menos una clase")
-    @NotEmpty
     private List<ClaseDto> clasesAsignadas;
+
+    private List<SolicitudDeAgenda> solicitudDeAgenda;
 }

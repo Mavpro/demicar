@@ -15,5 +15,6 @@ public interface SolicitudDeAgendaRepository extends CrudRepository<SolicitudDeA
     List<SolicitudDeAgenda> findByInstructor_Id (Long instructorId);
     List<SolicitudDeAgenda> findAllByInstructorIdAndFechaClaseBetween(Long instructorId, LocalDateTime fechaInicio, LocalDateTime fechaFin);
     List<SolicitudDeAgenda> findAllByCliente_IdAndFechaClaseBetween(Long id, LocalDateTime fechaClase, LocalDateTime fechaClase2);
+    List<SolicitudDeAgenda> findAllByAuto_IdAndFechaClaseBetween(Long id, LocalDateTime fechaClase, LocalDateTime fechaClase2);
 
 }

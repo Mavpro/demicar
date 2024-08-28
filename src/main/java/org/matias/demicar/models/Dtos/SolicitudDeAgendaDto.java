@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.matias.demicar.models.entities.Auto;
 import org.matias.demicar.models.entities.Instructor;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class SolicitudDeAgendaDto {
     private Long id;
     private ClienteDto cliente;  // DTO para Cliente
     private InstructorDto instructor;  // DTO para Instructor
+    private Auto auto;
     private ClaseDto clase;  // DTO para Clase
     private LocalDateTime fechaSolicitud;
     private LocalDateTime fechaClase;

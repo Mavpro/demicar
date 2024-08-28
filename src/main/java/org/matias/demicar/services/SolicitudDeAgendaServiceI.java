@@ -21,6 +21,8 @@ List<SolicitudDeAgendaDto> getSolicitudDeAgendas();
     List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorClientePorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
 
+    List<SolicitudDeAgendaDto> obtenerSolicitudDeAgendasPorAutoPorFechas(Long id, LocalDateTime fechaInicio, LocalDateTime fechaFin);
+
     SolicitudDeAgendaDto crearSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO);
 
     SolicitudDeAgendaDto actualizarSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO,Long id);
