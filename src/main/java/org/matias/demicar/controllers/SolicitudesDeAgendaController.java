@@ -1,6 +1,7 @@
 package org.matias.demicar.controllers;
 
 import jakarta.validation.Valid;
+import org.matias.demicar.models.Dtos.AutoDto;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
@@ -34,47 +35,68 @@ public class SolicitudesDeAgendaController {
     SolicitudDeAgendaServiceI solicitudDeAgendaService;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolicitudesDeAgendaController.class);
 
+    @PostMapping
+    public ResponseEntity<CustomResponse<SolicitudDeAgendaDto>> save(@Valid @RequestBody SolicitudDeAgendaDto body, BindingResult bindingResult) {
+        CustomResponse<SolicitudDeAgendaDto> response = new CustomResponse<>();
+        List<String> errors = new ArrayList<>();
 
+        if (bindingResult.hasErrors()) {
+            errors.addAll(bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList()));        }
 
+        try {
+            SolicitudDeAgendaDto savedSolicitud = solicitudDeAgendaService.crearSolicitudDeAgenda(body);
+            System.out.println(savedSolicitud);
+            response.setData(savedSolicitud);
+            response.setErrors(Collections.emptyList());
+            response.setStatus(HttpStatus.CREATED);
+            response.setMessage("Solicitud de agenda agregada con exito");
+            response.setData(savedSolicitud);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            errors.add(e.getMessage()+e.getCause());
+            response.setErrors(errors.stream().toList());
+            response.setStatus(HttpStatus.BAD_REQUEST);
+            response.setMessage(e.getMessage() + " Solicitud no guardada");
+            response.setData(null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping
+    public ResponseEntity<CustomResponse<List<SolicitudDeAgendaDto>>> findSolicitudes( ) {
+        List<String> errores = new ArrayList<>();
+        CustomResponse<List<SolicitudDeAgendaDto>> response = new CustomResponse<>();
+        try {
+            List<SolicitudDeAgendaDto> solics = new ArrayList<>();
+            solics=solicitudDeAgendaService.getSolicitudDeAgendas();
 
+            if (solics.isEmpty() ) { // VACIO ?
+                errores.add("No hay solicitud de agenda");
+                response.setData(null);
+                response.setMessage("No hay solicitudes para mostrar");
+                response.setErrors(errores);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
-    /*
+            } else {
+                response.setStatus(HttpStatus.OK);
+                response.setData(solics);
+                response.setMessage("Solicitudes encontradas");
+                response.setErrors(errores);
+                return new ResponseEntity<>(response, HttpStatus.OK);
 
+            }
 
-        @PostMapping
-        public ResponseEntity<SolicitudDeAgendaDto> save(@RequestBody SolicitudDeAgendaDto solicitud,BindingResult bindingResult) {
-            CustomResponse<ClienteController> response = new CustomResponse<>();
-            List<String> errors = new ArrayList<>();
-            if(bindingResult.hasErrors()) {
-                errors.addAll(bindingResult.getFieldErrors().stream()
-                        .map(error->error.getField()+":"+error.getDefaultMessage())
-                        .collect(Collectors.toList()));
-            }//si hay algun error me da compo y error
+        } catch (Exception e) {
+            errores.add(e.getMessage());
+            response.setErrors(errores);
+            response.setMessage(e.getMessage());
+            response.setData(Collections.emptyList());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
-            if (solicitudDeAgendaService.existById())
-            return asd;
         }
 
-        @GetMapping("/{id}")
-        public ResponseEntity<Solicitud> obtenerSolicitudPorId(@PathVariable Long id) {
-            return solicitudService.obtenerSolicitudPorId(id)
-                    .map(solicitud -> ResponseEntity.ok(solicitud))
-                    .orElse(ResponseEntity.notFound().build());
-        }
 
-        // ... otros métodos, como actualizar, eliminar, etc.
+    }
 
-        @GetMapping("/cliente/{clienteId}")
-        public List<Solicitud> obtenerSolicitudesPorCliente(@PathVariable Long clienteId) {
-            return solicitudService.obtenerSolicitudesPorCliente(clienteId);
-        }
-
-        @GetMapping("/cliente/{clienteId}/rango/{fechaInicio}/{fechaFin}")
-        public List<Solicitud> obtenerSolicitudesPorClienteYRangoFechas(
-                @PathVariable Long clienteId,
-                @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-                @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin)  
-        {
-            return solicitudService.obtenerSolicitudesPorClienteYRangoFechas(clienteId, fechaInicio, fechaFin);
-        }*/
     }

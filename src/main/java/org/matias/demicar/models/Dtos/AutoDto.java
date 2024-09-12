@@ -39,5 +39,5 @@ public class AutoDto {
 
     private List<ClaseDto> clasesAsignadas;
 
-    private List<SolicitudDeAgenda> solicitudDeAgenda;
+    private List<SolicitudDeAgendaDto> solicitudDeAgenda;
 }

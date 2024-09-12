@@ -30,4 +30,6 @@ public class Cliente {
     private List<SolicitudDeAgenda> solicitudesDeAgenda;
 
 
+    public Cliente(Long clienteId) {
+    }
 }

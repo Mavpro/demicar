@@ -37,13 +37,7 @@ public class ClienteDto {
     @NotNull(message = "El estado de 'activo' no puede ser nulo")
     private Boolean activo;
 
-    @NotBlank(message = "El tema es obligatorio")
-    @Size(min = 5, max = 255, message = "El tema debe tener entre 5 y 255 caracteres")
-    private String tema;
 
-    @Min(value = 1, message = "La evaluación debe ser mayor o igual a 1")
-    @Max(value = 5, message = "La evaluación debe ser menor o igual a 5")
-    private int eval;
 
     // Incluye la lista de solicitudes si es necesario, pero maneja las referencias cíclicas
     private List<SolicitudDeAgendaDto> solicitudesDeAgenda;

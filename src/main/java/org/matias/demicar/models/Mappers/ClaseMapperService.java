@@ -16,7 +16,7 @@ public class ClaseMapperService {
     }
 
     // Método para convertir un DTO a entidad
-    public Clase convertToEntity(ClaseDto claseDto) {
+    public Clase convertToEntity(Clase claseDto) {
         return modelMapper.map(claseDto, Clase.class);
     }
 

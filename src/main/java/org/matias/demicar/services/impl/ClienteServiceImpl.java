@@ -87,7 +87,10 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
     @Override
     public ClienteDto actualizarCliente(Long id, ClienteDto clienteDTO) {
 
-return null;
+        Cliente cliente = clienteMapper.convertToEntity(clienteDTO);
+        cliente.setId(id);
+        clienteRepository.save(cliente);
+     return clienteMapper.convertToDto(cliente);
 
     }
 

@@ -1,5 +1,6 @@
 package org.matias.demicar.services.impl;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.matias.demicar.exeptions.ResourceNotFoundException;
 import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
@@ -7,6 +8,7 @@ import org.matias.demicar.models.Mappers.AutoMapperService;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
 import org.matias.demicar.models.Mappers.InstructorMapperService;
 import org.matias.demicar.models.Mappers.SolicitudDeAgendaMapperService;
+import org.matias.demicar.models.entities.Auto;
 import org.matias.demicar.models.entities.Cliente;
 import org.matias.demicar.models.entities.Instructor;
 import org.matias.demicar.models.entities.SolicitudDeAgenda;
@@ -49,7 +51,8 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
 
     @Override
     public List<SolicitudDeAgendaDto> getSolicitudDeAgendas() {
-        return List.of();
+        List<SolicitudDeAgenda> sol = (List<SolicitudDeAgenda>) solicitudDeAgendaRepository.findAll();
+        return sol.stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -89,14 +92,16 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
         return solicitudDeAgendaRepository.findAllByAuto_IdAndFechaClaseBetween(id,fechaInicio,fechaFin)
                 .stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
-
+    @Transactional
     @Override
     public SolicitudDeAgendaDto crearSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO) {
         // Obtener el instructor y el cliente a partir de sus IDs
-        Instructor instructor = instructorRepository.findById(solicitudDeAgendaDTO.getId())
+        Instructor instructor = instructorRepository.findById(solicitudDeAgendaDTO.getInstructorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor no encontrado"));
-        Cliente cliente = clienteRepository.findById(solicitudDeAgendaDTO.getId())
+        Cliente cliente = clienteRepository.findById(solicitudDeAgendaDTO.getClienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+        Auto auto = autoRepository.findById(solicitudDeAgendaDTO.getAutoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Auto no encontrado"));
 
         // Verificar que el instructor no tenga clases agendadas en el mismo horario
         LocalDateTime fechaClaseSolicitada = solicitudDeAgendaDTO.getFechaClase();
@@ -114,7 +119,6 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
         if (!solicitudesCliente.isEmpty()) {
             throw new ValidationException("El cliente ya tiene una clase agendada en este horario o en un intervalo de 15 minutos.");
         }
-
 
         // Crear la nueva solicitud de agenda
         SolicitudDeAgenda nuevaSolicitud = solicitudDeAgendaMapper.convertToEntity(solicitudDeAgendaDTO);

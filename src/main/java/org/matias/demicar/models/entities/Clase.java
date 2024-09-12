@@ -37,6 +37,9 @@ public class Clase {
 
     private boolean activo;
 
+    public Clase(Long claseId) {
+    }
+
 
     // ... otros atributos y métodos
 }

@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 public class SolicitudDeAgendaDto {
 
     private Long id;
-    private ClienteDto cliente;  // DTO para Cliente
-    private InstructorDto instructor;  // DTO para Instructor
-    private Auto auto;
-    private ClaseDto clase;  // DTO para Clase
+    private Long clienteId;  // ID de Cliente
+    private Long instructorId;  // ID de Instructor
+    private Long autoId;  // ID de Auto
+    private Long claseId;  // Si es necesario mantener el DTO completo de Clase
     private LocalDateTime fechaSolicitud;
     private LocalDateTime fechaClase;
     private String tema;

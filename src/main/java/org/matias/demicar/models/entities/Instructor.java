@@ -25,4 +25,6 @@ public class Instructor {
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
     private List<SolicitudDeAgenda> solicitudesDeAgenda;
 
+    public Instructor(Long instructorId) {
+    }
 }

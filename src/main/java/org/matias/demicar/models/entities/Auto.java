@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.matias.demicar.models.Dtos.SolicitudDeAgendaDto;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public class Auto {
 
     private boolean activo;
 
+    public Auto(Long autoId) {
+    }
 }
