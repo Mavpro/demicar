@@ -151,7 +151,7 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
 
     @Override
     public Boolean existById(Long id) {
-        return null;
+        return solicitudDeAgendaRepository.existsById(id);
     }
 }
 
