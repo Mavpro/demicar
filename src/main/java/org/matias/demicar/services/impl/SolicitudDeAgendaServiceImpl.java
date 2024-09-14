@@ -136,12 +136,19 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
 
     @Override
     public SolicitudDeAgendaDto actualizarSolicitudDeAgenda(SolicitudDeAgendaDto solicitudDeAgendaDTO, Long id) {
-        return null;
+        SolicitudDeAgenda solicitudDeAgenda = solicitudDeAgendaMapper.convertToEntity(solicitudDeAgendaDTO);
+        solicitudDeAgenda.setId(id);
+        solicitudDeAgendaRepository.save(solicitudDeAgenda);
+        return solicitudDeAgendaMapper.convertToDto(solicitudDeAgenda);
+
     }
 
     @Override
     public Optional eliminarSolicitudDeAgenda(Long id) {
-        return Optional.empty();
+        SolicitudDeAgenda soli = solicitudDeAgendaRepository.findById(id).orElse(null);
+        soli.setActivo(false);
+        solicitudDeAgendaRepository.save(soli);
+        return Optional.of(solicitudDeAgendaMapper.convertToDto(soli));
     }
 
     @Override

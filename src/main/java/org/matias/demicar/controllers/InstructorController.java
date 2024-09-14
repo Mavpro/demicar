@@ -122,7 +122,7 @@ public class InstructorController {
                     .collect(Collectors.toList()));
         }
         if (!errors.isEmpty()||!instructorService.existById(id)) {
-            if (!instructorService.existById(body.getId())){
+            if (!instructorService.existById(id)){
                 errors.add("El instructor no existe");
             }
             response.setErrors(errors);

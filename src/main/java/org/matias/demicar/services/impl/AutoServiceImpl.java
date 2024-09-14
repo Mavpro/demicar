@@ -103,7 +103,7 @@ public class AutoServiceImpl implements AutoServiceI {
         Auto auto = autoRepository.findById(id).orElse(null);
         auto.setActivo(false);
         autoRepository.save(auto);
-        return Optional.of(auto);
+        return Optional.of(autoMapper.convertToDto(auto));
     }
 
     @Override

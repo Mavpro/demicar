@@ -122,7 +122,7 @@ public class CoordinadorController {
                     .collect(Collectors.toList()));
         }
         if (!errors.isEmpty()||!coordinadorService.existById(id)) {
-            if (!coordinadorService.existById(body.getId())){
+            if (!coordinadorService.existById(id)){
                 errors.add("El coordinador no existe");
             }
             response.setErrors(errors);

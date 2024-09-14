@@ -119,7 +119,7 @@ public class AutoController {
                     .collect(Collectors.toList()));
         }
         if (!errors.isEmpty()||!autoService.existById(id)) {
-            if (!autoService.existById(body.getId())){
+            if (!autoService.existById(id)){
                 errors.add("El auto no existe");
             }
             response.setErrors(errors);

@@ -2,6 +2,7 @@ package org.matias.demicar.services.impl;
 
 import org.matias.demicar.models.Dtos.InstructorDto;
 import org.matias.demicar.models.Mappers.InstructorMapperService;
+import org.matias.demicar.models.entities.Auto;
 import org.matias.demicar.models.entities.Instructor;
 import org.matias.demicar.respositories.InstructorRepository;
 import org.matias.demicar.services.InstructorServiceI;
@@ -58,7 +59,10 @@ Optional<Instructor> instructor = instructorRepository.findById(id);
     @Override
     public InstructorDto actualizarInstructor(Long id, InstructorDto instructorDTO) {
 
-return null;
+        Instructor inst = instructorMapper.convertToEntity(instructorDTO);
+        inst.setId(id);
+        instructorRepository.save(inst);
+        return instructorMapper.convertToDto(inst);
 
     }
 
@@ -67,7 +71,7 @@ return null;
         Instructor instructor = instructorRepository.findById(id).orElse(null);
         instructor.setActivo(false);
         instructorRepository.save(instructor);
-        return Optional.of(instructor);
+        return Optional.of(instructorMapper.convertToDto(instructor));
     }
 
     @Override

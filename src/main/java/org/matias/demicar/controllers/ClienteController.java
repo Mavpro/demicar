@@ -123,7 +123,7 @@ public class ClienteController {
                     .collect(Collectors.toList()));
         }
         if (!errors.isEmpty()||!clienteService.existById(id)) {
-            if (!clienteService.existById(body.getId())){
+            if (!clienteService.existById(id)){
                 errors.add("El cliente no existe");
             }
             response.setErrors(errors);
@@ -134,7 +134,7 @@ public class ClienteController {
         }
         try {
             // Guardar cliente si no hay errores
-            ClienteDto persistCliente = clienteService.actualizarCliente(body.getId(),body);
+            ClienteDto persistCliente = clienteService.actualizarCliente(id,body);
             response.setStatus(HttpStatus.OK);
             response.setData(persistCliente);
             response.setMessage("Cliente actualizado");

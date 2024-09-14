@@ -99,7 +99,7 @@ Optional<Cliente> cliente = clienteRepository.findById(id);
         Cliente cliente = clienteRepository.findById(id).orElse(null);
         cliente.setActivo(false);
         clienteRepository.save(cliente);
-        return Optional.of(cliente);
+        return Optional.of(clienteMapper.convertToDto(cliente));
     }
 
     @Override

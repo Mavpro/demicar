@@ -67,7 +67,7 @@ return null;
         Coordinador coordinador = coordinadorRepository.findById(id).orElse(null);
         coordinador.setActivo(false);
         coordinadorRepository.save(coordinador);
-        return Optional.of(coordinador);
+        return Optional.of(coordinadorMapper.convertToDto(coordinador));
     }
 
     @Override
