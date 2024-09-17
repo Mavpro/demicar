@@ -2,6 +2,9 @@ package org.matias.demicar.controllers;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.matias.demicar.exeptions.ConstraintsViolation;
+import org.matias.demicar.exeptions.ResourceNotFoundException;
+import org.matias.demicar.exeptions.ValidationException;
 import org.matias.demicar.models.Dtos.ClienteDto;
 import org.matias.demicar.models.Mappers.ClienteMapperService;
 import org.matias.demicar.responses.CustomResponse;
@@ -30,126 +33,69 @@ public class ClienteController {
     ClienteMapperService clienteMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(ClienteController.class);
 
-
-
     @GetMapping
     public ResponseEntity<CustomResponse<List<ClienteDto>>> findAllClientes(@RequestParam(required = false) String nombre) {
         List<String> errores = new ArrayList<>();
         CustomResponse<List<ClienteDto>> response = new CustomResponse<>();
-        try {
             List<ClienteDto> clientes = new ArrayList<>();
             if (nombre == null) {
                 clientes.addAll(clienteService.getClientes().stream().filter(c->c.getActivo()).collect(Collectors.toList()));//no pone el nombre, todos
-            } else {
-                clienteService.obtenerClientePorNombre(nombre).stream().filter(c->c.getActivo()).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
-            }
-            if (clientes.isEmpty() ) { // VACIO ?
-                errores.add("No se encontro el cliente");
-                response.setData(null);
-                response.setMessage("No hay clientes para mostrar");
-                response.setErrors(errores);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
-            } else {
                 response.setStatus(HttpStatus.OK);
                 response.setData(clientes);
-                response.setMessage("Clientes encontrados");
+                response.setMessage("Clientes encontrados con exito.");
                 response.setErrors(errores);
                 return new ResponseEntity<>(response, HttpStatus.OK);
 
-            }
-
-        } catch (Exception e) {
-            errores.add(e.getMessage());
-            response.setErrors(errores);
-            response.setMessage(e.getMessage());
-            response.setData(Collections.emptyList());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
+            } else {
+                clienteService.obtenerClientePorNombre(nombre).stream().filter(c->c.getActivo()).forEach(clientes::add);//itera al servicio y a los que coindiden a clientes
+                response.setStatus(HttpStatus.OK);
+                response.setData(clientes);
+                response.setMessage("Clientes encontrado con el nomre : "+ nombre+".");
+                response.setErrors(errores);
+                return new ResponseEntity<>(response, HttpStatus.OK);
         }
-
-
     }
-    @PostMapping
-    public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
-        CustomResponse<ClienteDto> response = new CustomResponse<>();
-        List<String> errors = new ArrayList<>();
 
-        // Validar los campos usando BindingResult
+    @PostMapping
+    public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body,BindingResult bindingResult) {
+        // Verifica si hay errores de validación
+        List<String> errors = new ArrayList<>();
+        errors = bindingResult.getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.toList());
         if (bindingResult.hasErrors()) {
-            errors.addAll(bindingResult.getFieldErrors().stream()
-                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                    .collect(Collectors.toList()));
-        }
-        // Validar reglas de negocio
-        if (clienteService.existByNombreyApellido(body.getNombreApellido())) {
-            errors.add("Nombre ya existe");
-        }
-        if (clienteService.existByCorreo(body.getEmail())) {
-            errors.add("El email ya existe");
-        }
-        // Manejar errores si existen
-        if (!errors.isEmpty()) {
-            response.setErrors(errors);
-            response.setMessage("Errores de validación");
-            response.setData(null);
-            response.setStatus(HttpStatus.CONFLICT);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-        }
-        try {
-            // Guardar cliente si no hay errores
-            ClienteDto persistCliente = clienteService.crearCliente(body);
-            response.setStatus(HttpStatus.OK);
-            response.setData(persistCliente);
-            response.setMessage("Cliente guardado");
-            response.setErrors(Collections.emptyList());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.error("Error saving client", e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.setData(null);
-            response.setMessage("Ocurrió un error inesperado");
-            response.setErrors(Collections.singletonList("Error al guardar el cliente"));
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            throw new ConstraintsViolation(errors);
+        } // No se valida en el servicio poirque binding es con el DTO del controller, pero despues si
+
+        ClienteDto persistCliente = clienteService.crearCliente(body);
+        CustomResponse<ClienteDto> response = new CustomResponse<>(
+                HttpStatus.OK, "Cliente guardado", persistCliente, Collections.emptyList()
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PutMapping("/{id}")
-    public  ResponseEntity<CustomResponse<ClienteDto>> update(@PathVariable Long id, @Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
-        CustomResponse<ClienteDto> response = new CustomResponse<>();
+    public ResponseEntity<CustomResponse<ClienteDto>> update(@PathVariable Long id, @Valid @RequestBody ClienteDto body,BindingResult bindingResult ) {
+
         List<String> errors = new ArrayList<>();
+        errors = bindingResult.getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.toList());
         if (bindingResult.hasErrors()) {
-            errors.addAll(bindingResult.getFieldErrors().stream()
-                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                    .collect(Collectors.toList()));
-        }
-        if (!errors.isEmpty()||!clienteService.existById(id)) {
-            if (!clienteService.existById(id)){
-                errors.add("El cliente no existe");
-            }
-            response.setErrors(errors);
-            response.setMessage("No se pudo actualizar el cliente");
-            response.setData(null);
-            response.setStatus(HttpStatus.CONFLICT);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-        }
-        try {
-            // Guardar cliente si no hay errores
-            ClienteDto persistCliente = clienteService.actualizarCliente(id,body);
-            response.setStatus(HttpStatus.OK);
-            response.setData(persistCliente);
-            response.setMessage("Cliente actualizado");
-            response.setErrors(Collections.emptyList());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.error("Error saving client", e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            response.setData(null);
-            response.setMessage("Ocurrió un error inesperado");
-            response.setErrors(Collections.singletonList("Error al guardar el cliente"));
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            throw new ConstraintsViolation(errors);
+        } // No se valida en el servicio porque binding es con el DTO del controller, pero despues si
 
 
+        // Llamar al servicio para actualizar el cliente
+        ClienteDto persistCliente = clienteService.actualizarCliente(id, body);
+
+        // Construir la respuesta
+        CustomResponse<ClienteDto> response = new CustomResponse<>();
+        response.setStatus(HttpStatus.OK);
+        response.setData(persistCliente);
+        response.setMessage("Cliente actualizado");
+        response.setErrors(Collections.emptyList());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomResponse<ClienteDto>> delete(@Valid @PathVariable Long id) {

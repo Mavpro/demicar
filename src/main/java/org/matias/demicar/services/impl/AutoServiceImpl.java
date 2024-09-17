@@ -1,6 +1,8 @@
 package org.matias.demicar.services.impl;
 
 import jakarta.transaction.Transactional;
+import org.matias.demicar.exeptions.ResourceNotFoundException;
+import org.matias.demicar.exeptions.ValidationException;
 import org.matias.demicar.models.Dtos.AutoDto;
 
 import org.matias.demicar.models.Dtos.ClienteDto;
@@ -46,23 +48,33 @@ public class AutoServiceImpl implements AutoServiceI {
     @Override
     public List<AutoDto> obtenerAutosPorMatricula(String matricula) {
         List<Auto> autos = autoRepository.findByMatricula(matricula);
+        if(autos.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron autos con ese parametro");
+        }
         return autos.stream()
                 .map(autoMapper::convertToDto)
                 .collect(Collectors.toList());
-    }
+    }//done
+
     @Override
     public List<AutoDto> getAutos() {
         List<Auto> autos = (List<Auto>) autoRepository.findAll();
+        if (autos.isEmpty()) {
+            throw new ResourceNotFoundException("No hay autos ingresados");
+        }
         return autos.stream()
                 .map(autoMapper::convertToDto)
                 .collect(Collectors.toList());
-    }
+    }///done
 
     @Override
     public Optional<AutoDto> obtenerAutoPorId(Long id) {
-        Optional<Auto> auto = autoRepository.findById(id);
-        return auto.map(autoMapper::convertToDto);
-    }
+        Optional<Auto> autoOptional = autoRepository.findById(id);
+        if (autoOptional.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontro el id de la auto el id : " + id+".");
+        }
+        return autoOptional.map(autoMapper::convertToDto);
+    }//done
 
 
     @Transactional
@@ -71,6 +83,15 @@ public class AutoServiceImpl implements AutoServiceI {
         autoDTO.setActivo(true);
         Auto auto = autoMapper.convertToEntity(autoDTO);
         auto.setSolicitudDeAgenda(null);
+
+        List<String> errors = new ArrayList<>();
+        if(autoRepository.existsByMatricula(autoDTO.getMatricula())) {
+            errors.add("La matricula ya existe.");
+        }
+        // Lanza excepción si hay errores
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
         autoRepository.save(auto);
         List<SolicitudDeAgendaDto> agendas = autoDTO.getSolicitudDeAgenda();
         List<SolicitudDeAgenda> agendasCautos = new ArrayList<>();
@@ -88,10 +109,17 @@ public class AutoServiceImpl implements AutoServiceI {
         autoRepository.save(auto);
 
         return autoMapper.convertToDto(auto);
-    }
+    }//done
 
     @Override
     public AutoDto actualizarAuto(Long id, AutoDto autoDTO) {
+        List<String> errors = new ArrayList<>();
+
+        // Verificar si el cliente existe
+       if(!autoRepository.existsById(id)){
+           throw new ResourceNotFoundException("El auto con id: " + id + " no existe");
+        }
+
         Auto auto = autoMapper.convertToEntity(autoDTO);
         auto.setId(id);
         autoRepository.save(auto);
@@ -100,7 +128,7 @@ public class AutoServiceImpl implements AutoServiceI {
 
     @Override
     public Optional eliminarAuto(Long id) {
-        Auto auto = autoRepository.findById(id).orElse(null);
+        Auto auto = autoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("El Auto con id " + id + " no existe"));
         auto.setActivo(false);
         autoRepository.save(auto);
         return Optional.of(autoMapper.convertToDto(auto));
