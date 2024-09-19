@@ -109,7 +109,6 @@ public class AutoController {
         CustomResponse<AutoDto> response = new CustomResponse<>();
         List<String> errors = new ArrayList<>();
         autoService.eliminarAuto(id);
-        autoService.eliminarAuto(id);
         response.setStatus(HttpStatus.OK);
         response.setData(null);
         response.setMessage("Autocon id: " + id + " fue eliminado.");

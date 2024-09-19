@@ -33,6 +33,7 @@ public class ClienteServiceImpl implements ClienteServiceI {
 
     private final ClienteRepository clienteRepository;
     private final SolicitudDeAgendaRepository solicitudDeAgendaRepository;
+
     @Autowired
     private SolicitudDeAgendaMapperService solicitudDeAgendaMapperService;
 
@@ -58,15 +59,14 @@ public class ClienteServiceImpl implements ClienteServiceI {
         if (clienteOptional.isEmpty()) {
             throw new ResourceNotFoundException("Cliente con id " + id + " no encontrado");
         }
-        Cliente cliente = clienteOptional.get();
-        return Optional.of(clienteMapper.convertToDto(cliente));
-    }
+            return clienteOptional.map(clienteMapper::convertToDto);
+        }
 
     @Override
     public List<ClienteDto> obtenerClientePorNombre(String nombre) {
         List<Cliente> clientes = clienteRepository.findByNombreApellido(nombre);
         if (clientes.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron clientes con el nombre: " + nombre);
+            throw new ResourceNotFoundException("No se encontraron clientes con el nombre: " + nombre+".");
         }
 
         return clientes.stream()
@@ -95,6 +95,7 @@ public class ClienteServiceImpl implements ClienteServiceI {
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
+
 
         clienteRepository.save(cliente);
         List<SolicitudDeAgendaDto> agendas = clienteDTO.getSolicitudesDeAgenda();

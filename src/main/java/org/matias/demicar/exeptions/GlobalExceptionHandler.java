@@ -1,15 +1,23 @@
 package org.matias.demicar.exeptions;
 
 import org.matias.demicar.responses.CustomResponse;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.View;
 
 import java.util.Collections;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final View error;
+
+    public GlobalExceptionHandler(View error) {
+        this.error = error;
+    }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<CustomResponse<Void>> handleValidationException(ValidationException ex) {
@@ -22,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomResponse<Void>> handleGeneralException(Exception ex) {
+    public ResponseEntity<CustomResponse<Void>> handleGeneralException(ErrorServerExeption ex) {
         CustomResponse<Void> response = new CustomResponse<>(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Ocurrió un error inesperado",
@@ -48,6 +56,14 @@ public class GlobalExceptionHandler {
                 ex.getErrors()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<CustomResponse<Void>> handleValidationException(DataAccessException ex) {
+        CustomResponse<Void> response = new CustomResponse<>(
+                HttpStatus.SERVICE_UNAVAILABLE,"Error al accesar a la base de datos",
+                Collections.singletonList(ex.getMessage()));
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
 }
