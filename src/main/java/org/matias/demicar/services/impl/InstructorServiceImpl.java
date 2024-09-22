@@ -28,7 +28,7 @@ public class InstructorServiceImpl implements InstructorServiceI {
 
     @Override
     public List<InstructorDto> getInstructors() {
-        List<Instructor> instructors = (List<Instructor>) instructorRepository.findAll();
+        List<Instructor> instructors = (List<Instructor>) instructorRepository.findByActivo(true);
         return instructors.stream()
                 .map(instructorMapper::convertToDto)
                 .collect(Collectors.toList());

@@ -12,6 +12,7 @@ public interface AutoRepository extends CrudRepository<Auto, Long> {
     List<Auto> findBySolicitudDeAgenda(SolicitudDeAgenda solicitudDeAgenda);
     Boolean existsByMatricula(String matricula);
     Boolean existsById(long id);
+    List<Auto> findByActivo(boolean activo);
 
 
 }

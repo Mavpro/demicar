@@ -33,6 +33,7 @@ public class ClienteController {
     ClienteMapperService clienteMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(ClienteController.class);
 
+    @CrossOrigin
     @GetMapping
     public ResponseEntity<CustomResponse<List<ClienteDto>>> findAllClientes(@RequestParam(required = false) String nombre) {
         List<String> errores = new ArrayList<>();
@@ -55,7 +56,7 @@ public class ClienteController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
-
+    @CrossOrigin
     @PostMapping
     public ResponseEntity<CustomResponse<ClienteDto>> save(@Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
         // Verifica si hay errores de validación
@@ -73,7 +74,7 @@ public class ClienteController {
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse<ClienteDto>> update(@PathVariable Long id, @Valid @RequestBody ClienteDto body, BindingResult bindingResult) {
 
@@ -99,6 +100,7 @@ public class ClienteController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomResponse<ClienteDto>> delete(@Valid @PathVariable Long id) {
         CustomResponse<ClienteDto> response = new CustomResponse<>();

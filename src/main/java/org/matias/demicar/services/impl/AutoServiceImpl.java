@@ -58,7 +58,7 @@ public class AutoServiceImpl implements AutoServiceI {
 
     @Override
     public List<AutoDto> getAutos() {
-        List<Auto> autos = (List<Auto>) autoRepository.findAll();
+        List<Auto> autos = (List<Auto>) autoRepository.findByActivo(true);
         if (autos.isEmpty()) {
             throw new ResourceNotFoundException("No hay autos ingresados");
         }

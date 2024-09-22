@@ -44,7 +44,7 @@ public class ClienteServiceImpl implements ClienteServiceI {
 
     @Override
     public List<ClienteDto> getClientes() {
-        List<Cliente> clientes = (List<Cliente>) clienteRepository.findAll();
+        List<Cliente> clientes = (List<Cliente>) clienteRepository.findByActivo(true);
         if (clientes.isEmpty()) {
             throw new ResourceNotFoundException("No hay clientes ingresados");
         }

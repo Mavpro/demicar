@@ -11,4 +11,5 @@ public interface ClaseRepository extends CrudRepository<Clase, Long> {
         Boolean existsById(long id);
 
 
+
 }

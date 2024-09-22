@@ -9,6 +9,7 @@ public interface InstructorRepository extends CrudRepository<Instructor, Long> {
     List<Instructor> findByNombre(String nonmbre);
     Boolean existsByNombre(String nombre);
     Boolean existsByEmail(String email);
+    List<Instructor> findByActivo(boolean activo);
 
 
 }

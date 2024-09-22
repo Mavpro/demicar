@@ -51,7 +51,7 @@ public class SolicitudDeAgendaServiceImpl implements SolicitudDeAgendaServiceI {
 
     @Override
     public List<SolicitudDeAgendaDto> getSolicitudDeAgendas() {
-        List<SolicitudDeAgenda> sol = (List<SolicitudDeAgenda>) solicitudDeAgendaRepository.findAll();
+        List<SolicitudDeAgenda> sol = (List<SolicitudDeAgenda>) solicitudDeAgendaRepository.findByActivo(true);
         return sol.stream().map(solicitudDeAgendaMapper::convertToDto).collect(Collectors.toList());
     }
 

@@ -33,7 +33,7 @@ public class CoordinadorServiceImpl implements CoordinadorServiceI {
 
     @Override
     public List<CoordinadorDto> getCoordinadors() {
-        List<Coordinador> coordinadors = (List<Coordinador>) coordinadorRepository.findAll();
+        List<Coordinador> coordinadors = (List<Coordinador>) coordinadorRepository.findByActivo(true);
         if(coordinadors.isEmpty()) {
             throw new ResourceNotFoundException("No hay coordinadores ingresados.");
         }

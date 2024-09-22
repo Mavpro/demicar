@@ -9,6 +9,7 @@ public interface CoordinadorRepository extends CrudRepository<Coordinador, Long>
     List<Coordinador> findByNombre(String nonmbre);
     Boolean existsByNombre(String nombre);
     Boolean existsByEmail(String email);
+    List<Coordinador> findByActivo(boolean activo);
 
 
 }
