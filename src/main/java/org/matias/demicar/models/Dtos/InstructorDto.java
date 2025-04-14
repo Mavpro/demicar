@@ -1,6 +1,8 @@
 package org.matias.demicar.models.Dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
@@ -25,6 +27,6 @@ public class InstructorDto {
     private String telefono;
     private boolean activo;
 
-
+    @JsonIgnore
     private List<SolicitudDeAgenda> solicitudesDeAgenda;
 }

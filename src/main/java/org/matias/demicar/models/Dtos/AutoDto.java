@@ -1,6 +1,9 @@
 package org.matias.demicar.models.Dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -37,7 +40,9 @@ public class AutoDto {
     @NotNull(message = "El campo activo es obligatorio")
     private Boolean activo;
 
+    @JsonIgnore
     private List<ClaseDto> clasesAsignadas;
 
+    @JsonIgnore
     private List<SolicitudDeAgendaDto> solicitudDeAgenda;
 }

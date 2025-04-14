@@ -17,6 +17,7 @@ public class SolicitudDeAgendaDto {
     private Long id;
     private Long clienteId;  // ID de Cliente
     private Long instructorId;  // ID de Instructor
+    @JsonBackReference
     private Long autoId;  // ID de Auto
     private Long claseId;  // Si es necesario mantener el DTO completo de Clase
     private LocalDateTime fechaSolicitud;

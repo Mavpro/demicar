@@ -1,6 +1,9 @@
 package org.matias.demicar.models.Dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -19,5 +22,6 @@ public class CoordinadorDto {
     private String telefono;
     private boolean activo;
     // Incluye la lista de clases solo si es necesario y se deben manejar las referencias cíclicas con cuidado
+    @JsonIgnore
     private List<ClaseDto> clases;
 }

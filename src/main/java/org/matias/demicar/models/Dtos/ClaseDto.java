@@ -1,5 +1,6 @@
 package org.matias.demicar.models.Dtos;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -16,8 +17,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ClaseDto {
     private Long id;
+
     private SolicitudDeAgendaDto solicitudDeAgenda;  // Incluye el DTO completo
-    private CoordinadorDto coordinador;  // Incluye el DTO completo
+
+    @JsonBackReference
+    private CoordinadorDto coordinador;
+    @JsonBackReference
+    private AutoDto autoDto;// Incluye el DTO completo
+
     private LocalDateTime fechaDeAsignacion;
     private String estado;
     @NotBlank(message = "El tema es obligatorio")
